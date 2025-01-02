@@ -13,35 +13,25 @@ compile_program() {
     echo "Compilation successful: $output_file"
 }
 
-# Function to run the program with different thread counts and measure time.
+# Function to run the program with different thread counts
 benchmark() {
     local program=$1
     local min_threads=$2
     local max_threads=$3
     local runs=$4
     
-    echo "Thread,Run,Time(seconds)" > benchmark_results.csv
-    
     for threads in $(seq $min_threads $max_threads); do
         export OMP_NUM_THREADS=$threads
         echo "Testing with $threads threads..."
         
-        total_time=0
-
         for run in $(seq 1 $runs); do
-            start_time=$(date +%s.%N)
             ./"$program"
-            end_time=$(date +%s.%N)
-            execution_time=$(echo "$end_time - $start_time" | bc)
-            total_time=$(echo "$total_time + $execution_time" | bc)
         done
-
-        # Calculate the average
-        average_time=$(echo "$total_time / $runs" | bc -l)
-        echo "$threads,average,$average_time" >> benchmark_results.csv
+        
+        echo "----------------------------------------"
     done
     
-    echo "Benchmarking complete. Results saved in benchmark_results.csv"
+    echo "Benchmarking complete."
 }
 
 # Parse command line arguments.
